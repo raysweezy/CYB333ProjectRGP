@@ -1,0 +1,24 @@
+from scapy.all import sniff
+import os
+import time
+
+# List of known dark web TLDs
+dark_web_domains = ['.onion']
+
+def alert(domain):
+    print(f"ALERT: Accessed dark web domain: {domain}")
+
+def packet_callback(packet):
+    if packet.haslayer('IP'):
+        ip_src = packet['IP'].src
+        ip_dst = packet['IP'].dst
+        if any(domain in ip_dst for domain in dark_web_domains):
+            alert(ip_dst)
+
+def main():
+    print("Starting packet sniffing...")
+    # Start sniffing packets
+    sniff(prn=packet_callback, store=0)
+
+if __name__ == '__main__':
+    main()
